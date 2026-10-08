@@ -31,7 +31,8 @@ Router.register('/reports', async ({ query, container }) => {
     ${pageHead('التقارير', 'كل التقارير محسوبة من العمليات المسجلة وقابلة للتصدير', `
       <button class="btn btn-primary" id="btnXlsx">⬇ Excel</button>
       <button class="btn" id="btnCsv">⬇ CSV</button>
-      <button class="btn" id="btnPdf">🖨 PDF</button>`)}
+      <button class="btn" id="btnPdf">🖨 PDF</button>
+      <button class="btn" id="btnWorkbook" title="تنزيل كل التقارير في ملف Excel واحد">📚 كل التقارير</button>`)}
     <div class="card mb"><div class="card-body" style="display:flex;gap:9px;flex-wrap:wrap;">
       ${defs.map(d => `<button class="btn btn-sm ${d.key === def.key ? 'btn-primary' : ''}" data-rk="${d.key}">${REPORT_ICONS[d.key] || '📄'} ${esc(d.title)}</button>`).join('')}
     </div></div>
@@ -81,6 +82,13 @@ Router.register('/reports', async ({ query, container }) => {
   };
   document.getElementById('btnPdf').onclick = () => {
     window.open(`/api/print/${def.key}${paramsForExport()}&token=${encodeURIComponent(Store.token)}`, '_blank');
+  };
+  document.getElementById('btnWorkbook').onclick = async () => {
+    try {
+      toast('جارٍ تجهيز مصنف التقارير الكامل...', 'info');
+      await Api.download(`/export/workbook/xlsx${paramsForExport()}`, `oyaynah-reports-${today()}.xlsx`);
+      toast('تم تنزيل كل التقارير في ملف واحد', 'ok');
+    } catch (e) { toast(e.message, 'err'); }
   };
 });
 

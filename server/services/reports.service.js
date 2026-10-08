@@ -331,7 +331,7 @@ REPORTS.balances = {
         ROUND(COALESCE(SUM(jl.credit),0),2) AS credit
       FROM accounts ac
       LEFT JOIN journal_lines jl ON jl.account_id = ac.id
-      LEFT JOIN journal_entries je ON je.id = jl.entry_id AND je.is_void = 0
+      LEFT JOIN journal_entries je ON je.id = jl.entry_id AND je.is_void = 0 ${p1.sql} ${p2}
       GROUP BY ac.id
       HAVING debit <> 0 OR credit <> 0
       ORDER BY ac.code

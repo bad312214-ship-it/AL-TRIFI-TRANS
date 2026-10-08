@@ -33,6 +33,36 @@ router.get('/reconciliation', requirePerm('reconciliation.view'), wrap(async (re
 }));
 
 /* -------- التصدير -------- */
+/** تصدير عدة تقارير في مصنف Excel واحد مع ورقة غلاف وفهرس */
+router.get('/export/workbook/xlsx', requirePerm('reports.export'), wrap(async (req, res) => {
+  const allKeys = reports.listReports().map(r => r.key);
+  const keys = (req.query.keys ? String(req.query.keys).split(',').filter(Boolean) : allKeys)
+    .filter(k => allKeys.includes(k));
+  if (!keys.length) throw badRequest('لا توجد تقارير صالحة للتصدير');
+
+  const projectName = req.query.project_id
+    ? (getDb().prepare('SELECT name FROM projects WHERE id = ?').get(Number(req.query.project_id)) || {}).name
+    : 'كل المشاريع';
+
+  const list = keys.map(key => ({ report: reports.run(key, req.query) }));
+  const buf = await exporter.toWorkbookXLSX(list, {
+    projectName,
+    from: req.query.from || req.query.date_from,
+    to: req.query.to || req.query.date_to,
+    environment: require('../config').isDemo ? 'demo' : 'production'
+  });
+
+  audit.log(req, {
+    action: 'export', entityType: 'report', entityId: null, entityLabel: 'مصنف التقارير الكامل',
+    summary: `تصدير مصنف Excel يجمع ${list.length} تقريرًا`
+  });
+
+  const stamp = new Date().toISOString().slice(0, 10);
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', `attachment; filename="oyaynah-reports-${stamp}.xlsx"`);
+  res.send(Buffer.from(buf));
+}));
+
 router.get('/export/:key/:format', requirePerm('reports.export'), wrap(async (req, res) => {
   const { key, format } = req.params;
   if (!['csv', 'xlsx'].includes(format)) throw badRequest('صيغة التصدير المدعومة: csv أو xlsx');

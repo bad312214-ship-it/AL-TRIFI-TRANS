@@ -442,6 +442,28 @@ test('الصلاحيات: المطلع لا يستطيع الاعتماد، وا
 });
 
 /* ═══════════════ 9) التصدير ═══════════════ */
+test('كل التقارير تعمل مع وبدون الفلاتر (حماية من عدم تطابق الوسائط)', () => {
+  const full = {
+    project_id: 1, from: D(1, 1), to: D(12, 31), date_from: D(1, 1), date_to: D(12, 31),
+    search: 'T-', contractor_id: 1, supplier_id: 1, funding_source_id: 1,
+    status: 'open', approval_status: 'approved', review_status: 'pending', overdue_only: '1', over_only: '1'
+  };
+  for (const def of reports.listReports()) {
+    for (const filters of [{}, full]) {
+      const r = reports.run(def.key, filters);
+      assert.ok(Array.isArray(r.rows), `${def.key} يجب أن يُعيد rows`);
+      assert.ok(Array.isArray(r.columns), `${def.key} يجب أن يُعيد columns`);
+      assert.equal(typeof r.row_count, 'number');
+      // كل صف يجب أن يملك كل الأعمدة المعرَّفة
+      for (const row of r.rows) {
+        for (const col of r.columns) assert.ok(col.key in row, `${def.key}: العمود ${col.key} ناقص في الصف`);
+      }
+      // الإجماليات لا تتجاوز حدود المعقول
+      for (const k of (r.totalKeys || [])) assert.ok(Number.isFinite(r.totals[k]), `${def.key}: إجمالي ${k} غير رقمي`);
+    }
+  }
+});
+
 test('التصدير: CSV يحتوي الأعمدة والإجمالي، و XLSX يُنتج ملفًا صالحًا', async () => {
   const exporter = require('../server/services/export.service');
   const rep = reports.run('advances', {});
@@ -453,4 +475,22 @@ test('التصدير: CSV يحتوي الأعمدة والإجمالي، و XLSX
   assert.ok(buf.byteLength > 2000, 'ملف Excel يجب ألا يكون فارغًا');
   // توقيع ملف ZIP (XLSX هو ZIP)
   assert.equal(buf[0], 0x50); assert.equal(buf[1], 0x4b);
+});
+
+test('التصدير: مصنف يجمع كل التقارير في ملف واحد مع ورقة غلاف', async () => {
+  const exporter = require('../server/services/export.service');
+  const list = reports.listReports().map(r => ({ report: reports.run(r.key, {}) }));
+  assert.ok(list.length >= 11, 'يجب أن يتوفر 11 تقريرًا على الأقل');
+  const buf = await exporter.toWorkbookXLSX(list, {
+    projectName: 'أرض العيينة', environment: 'demo'
+  });
+  assert.equal(buf[0], 0x50); assert.equal(buf[1], 0x4b, 'توقيع ZIP');
+  assert.ok(buf.byteLength > 10000, 'المصنف يجب أن يحتوي كل التقارير');
+  // كل تقرير أخذ اسم ورقة صالحًا (≤31 حرفًا)
+  for (const it of list) {
+    assert.ok(it.sheetName && it.sheetName.length <= 31, `اسم الورقة ${it.sheetName} طويل`);
+    assert.ok(!/[\[\]:*?/\\]/.test(it.sheetName), `اسم الورقة ${it.sheetName} يحتوي رموزًا ممنوعة`);
+  }
+  // لا تكرار في أسماء الأوراق
+  assert.equal(new Set(list.map(i => i.sheetName)).size, list.length, 'أسماء الأوراق يجب أن تكون فريدة');
 });
