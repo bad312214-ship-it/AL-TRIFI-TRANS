@@ -1,9 +1,6 @@
 node_modules/
-data/*.db
-data/*.db-journal
-data/*.db-wal
-data/*.db-shm
-data/demo/*.db
+data/
+!data/.gitkeep
 uploads/*
 !uploads/.gitkeep
 .env
