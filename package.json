@@ -1,0 +1,30 @@
+{
+  "name": "al-oyaynah-accounting",
+  "version": "1.0.0",
+  "private": true,
+  "description": "نظام محاسبي متكامل لمشروع أرض العيينة - عهد المقاولين والتحويلات وإخلاء العهد وفواتير الموردين",
+  "main": "server/index.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "migrate": "node server/scripts/migrate.js",
+    "seed:reference": "node server/scripts/seed-reference.js",
+    "seed:demo": "cross-env NODE_ENV=demo node server/scripts/seed-demo.js || NODE_ENV=demo node server/scripts/seed-demo.js",
+    "demo": "NODE_ENV=demo node server/index.js",
+    "test": "node --test tests/*.test.js",
+    "reset": "node server/scripts/reset.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "exceljs": "^4.4.0",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "^11.10.0"
+  }
+}
