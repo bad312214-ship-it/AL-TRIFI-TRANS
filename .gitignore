@@ -7,3 +7,8 @@ uploads/*
 .env.local
 *.log
 .DS_Store
+
+# ملفات التصدير المولَّدة (لا تُرفع إلى Git)
+public/downloads/*
+!public/downloads/.gitkeep
+exports/
