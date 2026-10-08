@@ -1,5 +1,6 @@
 'use strict';
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const config = require('./config');
 const { requireAuth } = require('./middleware/auth');
@@ -35,6 +36,17 @@ function createApp() {
   app.use('/api', requireAuth, require('./routes/reports.routes'));
 
   // الواجهة
+  /* تنزيل ملف مصدَّر من مجلد downloads (نفس أصل المعاينة — يعمل داخل المنصة) */
+  app.get('/download/:file', (req, res) => {
+    const name = path.basename(req.params.file);
+    const file = path.join(config.root, 'public', 'downloads', name);
+    if (!fs.existsSync(file)) {
+      return res.status(404).type('text/plain; charset=utf-8')
+        .send('الملف غير موجود — ولّده بالأمر: node server/scripts/export-workbook.js public/downloads/<الاسم>.xlsx');
+    }
+    res.download(file);
+  });
+
   app.use(express.static(path.join(config.root, 'public'), { index: 'index.html', maxAge: '0' }));
   app.get(/^\/(?!api\/).*/, (req, res) => res.sendFile(path.join(config.root, 'public', 'index.html')));
 

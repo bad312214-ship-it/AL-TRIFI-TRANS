@@ -50,6 +50,10 @@ function renderLogin() {
           <input name="password" type="password" autocomplete="current-password" required></div>
         <button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;" type="submit">تسجيل الدخول</button>
         <div id="loginMsg"></div>
+        <a class="btn" style="width:100%;justify-content:center;margin-top:10px;"
+           href="/download/oyaynah-reports-2026-10-08.xlsx" title="تنزيل ملف Excel يجمع كل التقارير (بيانات تجريبية)">
+           ⬇ تنزيل ملف Excel (كل التقارير)
+        </a>
         <div class="login-foot">
           نظام محاسبي مترابط · مصدر التمويل → التحويل → العهدة → الإخلاء<br>
           جميع الأرصدة تُحتسب تلقائيًا من العمليات المسجلة
@@ -115,6 +119,7 @@ function renderShell() {
             <span class="s-ico">🔍</span>
             <div class="search-results" id="searchResults"></div>
           </div>
+          <a class="btn btn-sm btn-ghost" href="/download/oyaynah-reports-2026-10-08.xlsx" title="تنزيل ملف Excel يجمع كل التقارير">⬇ Excel</a>
           <button class="btn btn-sm btn-ghost" id="themeBtn" title="الوضع الليلي">🌙</button>
           <div class="menu">
             <div class="avatar" id="userBtn">${esc((Store.user?.fullName || '?').trim().charAt(0))}</div>
