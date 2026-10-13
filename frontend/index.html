@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>استوديو تريفي للأفلام الذكية</title>
+  <link rel="icon" type="image/jpeg" href="/assets/logo.jpg" />
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <div id="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#/">
+        <img src="/assets/logo.jpg" alt="TRIFI" class="brand-logo" />
+        <div class="brand-text">
+          <strong data-i18n="brand">استوديو تريفي للأفلام الذكية</strong>
+          <small data-i18n="brandSub">منصة إنتاج الأفلام بالذكاء الاصطناعي</small>
+        </div>
+      </a>
+      <nav class="main-nav">
+        <a href="#/" data-nav="studio" data-i18n="navStudio">الاستوديو</a>
+        <a href="#/projects" data-nav="projects" data-i18n="navProjects">مشاريعي</a>
+        <a href="#/settings" data-nav="settings" data-i18n="navSettings">الإعدادات</a>
+      </nav>
+      <div class="topbar-actions">
+        <button id="lang-toggle" class="btn ghost sm" title="Language">EN</button>
+      </div>
+    </header>
+
+    <main id="view" class="view"></main>
+
+    <footer class="footer">
+      <span data-i18n="footerNote">المحركات المحلية تعمل بدون إنترنت — اربط مفاتيح API في الإعدادات لتفعيل التوليد المتقدم</span>
+    </footer>
+  </div>
+
+  <div id="toasts" class="toasts"></div>
+  <div id="modal-root"></div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
